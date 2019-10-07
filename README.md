@@ -1,27 +1,8 @@
-# Xoos
+# DB::Xoos::Pg
 
-Xoos is an ORM designed for convenience and ease of use, it is modeled after DBIx::\* if you're into that kind of thing already (note: some concepts and names have deviated).
+DB::Xoos::Pg is an ORM designed for convenience and ease of use.  It is based upon [DB::Xoos](https://github.com/tony-o/p6-xoo), provides roles and enhancements and allows you to connect to postgres for ultimate magic.
 
-(This module was originally named Koos until my friends in Israel let me know that that's a vulgar word in Arabic)
-
-[![CircleCI](https://circleci.com/gh/tony-o/perl6-xoo.svg?style=svg)](https://circleci.com/gh/tony-o/perl6-xoo)
-
-## what works
-
-* relationships
-* row object inflation (calling .first on a query returns a Xoos::Row)
-* row objects inherit from the model::@columns
-* model level convenience methods
-* row level convenience methods
-* basic handling compounded primary keys
-* column validation hooks
-* YAML models (auto composed)
-* decouple SQL generation from Xoos::Searchable (this includes decoupling the SQL generation from the DB layer) - DB::Pg is intended to be used but epoll is not ported to OSX
-* dynamic model loading (Pg)
-
-## todo
-
-* prefetch relationships option (currently everything is prefetched)
+[![CircleCI](https://circleci.com/gh/tony-o/p6-db-xoos-pg.svg?style=svg)](https://circleci.com/gh/tony-o/p6-db-xoos-pg)
 
 # Usage
 
@@ -54,9 +35,9 @@ my $xyz-orders = $xyz.orders.count;
 
 ### lib/app.pm6
 ```perl6
-use DB::Xoos::SQLite;
+use DB::Xoos::Pg;
 
-my DB::Xoos::SQLite $d .=new;
+my DB::Xoos::Pg $d .=new;
 
 $d.connect('sqlite://xyz.sqlite3');
 
@@ -75,8 +56,8 @@ my $xyz-orders = $xyz.orders.count;
 
 ### lib/Model/Customer.pm6
 ```perl6
-use DB::Xoos::Model;
-unit class Model::Customer does DB::Xoos::Model['customer'];
+use DB::Xoos::Role::Model;
+unit class Model::Customer does DB::Xoos::Role::Model['customer'];
 
 has @.columns = [
   id => {
@@ -98,18 +79,18 @@ has @.relations = [
 ];
 ```
 
-# role DB::Xoos::Model
+# role DB::Xoos::Role::Model
 
 What is a model?  A model is essentially a table in your database.  Your ::Model::X is pretty barebones, in this module you'll defined `@.columns` and `@.relations` (if there are any relations).
 
 ## Example
 
 ```perl6
-use DB::Xoos::Model;
+use DB::Xoos::Role::Model;
 # the second argument below is optional and also accepts a type.
 # if the arg is omitted then it attempts to auto load ::Row::Customer
 # if it fails to auto load then it uses an anonymous Row and adds convenience methods to that
-unit class X::Model::Customer does DB::Xoos::Model['customer', 'X::Row::Customer']; 
+unit class X::Model::Customer does DB::Xoos::Role::Model['customer', 'X::Row::Customer']; 
 
 has @.columns = [
   id => {
@@ -151,7 +132,7 @@ In this example we're creating a customer model with columns `id, name, contact,
 
 ### Breakdown
 
-`class :: does DB::Xoos::Model['table-name', 'Optional String or Type'];`
+`class :: does DB::Xoos::Role::Model['table-name', 'Optional String or Type'];`
 
 Here you can see the role accepts one or two parameters, the first is the DB table name, the latter is a String or Type of the row you'd like to use for this model.  If no row is found then Xoos will create a generic row and add helper methods for you using the model's column data.
 
@@ -206,20 +187,20 @@ Returns the result of a `select count` for the current filter selection.  Provid
 
 Deletes all rows matching criteria.  Providing `%filter` results in `.search(%filter).delete`
 
-### `.new-row(%field-data?)`
+### `.insert(%field-data?)`
 
 Creates a new row with %field-data.
 
 ## Convenience methods
 
-Xoos::Model inheritance allows you to have convenience methods, these methods can act on whatever the current set of filters is.
+DB::Xoos::Role::Model inheritance allows you to have convenience methods, these methods can act on whatever the current set of filters is.
 
 Consider the following:
 
 Convenience model definition:
 
 ```perl6
-class X::Model::Customer does Xoos::Model['customer'];
+class X::Model::Customer does DB::Xoos::Role::Model['customer'];
 
 # columns and relations
 
@@ -242,11 +223,11 @@ $single-customer.remove-closed-orders;
 # this removes all orders for customers with id = 5
 ```
 
-# role DB::Xoos::Row
+# role DB::Xoos::Role::Row
 
 A role to apply to your `::Row::Customer`.  If there is no `::Row::Customer` a generic row is created using the column and relationship data specified in the corresponding `Model` and this file is only really necessary if you want to add convenience methods.
 
-When a `class :: does DB::Xoos::Row`, it receives the info from the model and adds the methods for setting/getting field data.
+When a `class :: does DB::Xoos::Role::Row`, it receives the info from the model and adds the methods for setting/getting field data.
 
 With the model definition above:
 
