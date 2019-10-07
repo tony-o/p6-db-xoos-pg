@@ -11,7 +11,7 @@ jobs:
       - run: 
           name: install build deps
           command: |
-              apt install -y postgresql-server
+              apt install -y postgresql
               zef install --deps-only .
       - run:
           name: test 
