@@ -5,7 +5,7 @@
   "description" : "An ORM, with support (and no meta model syntax). postgres",
   "auth"        : "github:tony-o",
   "authors"     : [ "Tony O'Dell" ],
-  "depends"     : [ "DB::Xoos", "DB::Pg" ],
+  "depends"     : [ "DB::Xoos:ver<0.1.0+>", "DB::Pg" ],
   "test-depends": [ ],
   "license"     : "Artistic-2.0",
   "provides"    : {
