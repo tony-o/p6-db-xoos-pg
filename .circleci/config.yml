@@ -3,10 +3,9 @@ jobs:
   build:
     docker:
       - image: tonyodell/rakudo-nightly:latest
-#      - image: circleci/postgres:9.6.2-alpine
-#        environment:
-#          POSTGRES_USER: xoos 
-#          POSTGRES_DB: xoos
+        environment:
+          XOOS_TEST: psql://root@localhost/xoos 
+      - image: circleci/postgres:9.6.5-alpine-ram
 
     working_directory: ~
 
@@ -15,12 +14,11 @@ jobs:
       - run: 
           name: install build deps
           command: |
-              ln -fs /usr/share/zoneinfo/America/New_York /etc/localtime
-              DEBIAN_FRONTEND=noninteractive sudo apt install -y postgresql
+              apt install postgresql-client
               zef install --deps-only .
       - run:
           name: test 
           command: |
               psql -c 'create database xoos; create user xoos; grant all on database xoos to xoos'
-              psql -d xoos -u xoos < ./sql/tests.sql
+              psql -d xoos -u root < ./sql/tests.sql
               zef test .
