@@ -4,7 +4,7 @@ jobs:
     docker:
       - image: tonyodell/rakudo-nightly:latest
         environment:
-          XOOS_TEST: psql://root@localhost/circleci 
+          XOOS_TEST: psql://root@localhost/circle_test 
       - image: circleci/postgres:9.6.5-alpine-ram
 
     working_directory: ~
@@ -19,5 +19,5 @@ jobs:
       - run:
           name: test 
           command: |
-              psql -d $XOOS_TEST < ./sql/tests.sql
+              psql -d postgresql://root@localhost/circle_test < ./sql/tests.sql
               zef test .
