@@ -1,0 +1,21 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: tonyodell/rakudo-nightly:latest
+
+    working_directory: ~
+
+    steps:
+      - checkout
+      - run: 
+          name: install build deps
+          command: |
+              apt install -y postgresql-server
+              zef install --deps-only .
+      - run:
+          name: test 
+          command: |
+							psql -c 'create database xoos; create user xoos; grant all on database xoos to xoos' && |
+							psql -d xoos -u xoos < ./sql/tests.sql && |
+              zef test .
