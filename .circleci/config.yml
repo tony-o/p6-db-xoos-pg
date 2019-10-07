@@ -16,6 +16,6 @@ jobs:
       - run:
           name: test 
           command: |
-							psql -c 'create database xoos; create user xoos; grant all on database xoos to xoos' && |
-							psql -d xoos -u xoos < ./sql/tests.sql && |
+              psql -c 'create database xoos; create user xoos; grant all on database xoos to xoos' && |
+              psql -d xoos -u xoos < ./sql/tests.sql && |
               zef test .
