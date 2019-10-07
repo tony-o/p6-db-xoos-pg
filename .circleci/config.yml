@@ -17,7 +17,10 @@ jobs:
               apt install -y postgresql-client
               zef install --deps-only .
       - run:
-          name: test 
+          name: setup db
           command: |
               psql -d postgresql://root@localhost/circle_test < ./sql/tests.sql
+      - run:
+          name: test 
+          command: |
               zef test .
