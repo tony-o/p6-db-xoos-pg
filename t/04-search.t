@@ -19,9 +19,10 @@ subtest {
   my Int $uid = 10000.rand.Int;
   my Int $gid = 10000.rand.Int;
   my $model = $db.model('Customers');
-  my (@obj, $obj, $search, $scratch);
+  my (@obj, $obj, $search, $scratch, $stay);
 
   $model.insert({ name => 'hello world' });
+  $stay = $model.search({name => 'XYZ123'});
   ok $model.search({
     name => 'test',
   }).^name.split('+{')[0], 'Model::Customers';#DB::Xoos::Pg::Searchable;
@@ -29,6 +30,7 @@ subtest {
     name => "test$uid",
   });
   $obj = $model.search({ :name("test$uid") }).first;
+  is $stay.get-filter, { name => 'XYZ123' };
   @obj = $model.all;
   ok @obj.elems > 0, 'insert went ok';
   ok @obj[0] ~~ DB::Xoos::Pg::Row, 'object does DB::Xoos::Pg::Row';

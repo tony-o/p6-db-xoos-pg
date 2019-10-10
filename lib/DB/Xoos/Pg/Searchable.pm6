@@ -9,7 +9,8 @@ has %!query;
 has %!filter;
 has %!option;
 
-multi submethod BUILD (:%!filter, :%!option) {
+multi submethod BUILD (:%!filter, :%!option, *%_) {
+  callsame;
   self.row.WHAT.^add_role(DB::Xoos::Pg::Row);
 }
 
@@ -26,10 +27,12 @@ multi method search(%filters, %options?) {
     %option = %options;
   }
   my $clone = self.clone;
-  $clone!set-filter(%filter);
-  $clone!set-option(%option);
+  $clone.set-filter(%filter);
+  $clone.set-option(%option);
   $clone;
 }
+
+method get-filter { %!filter; }
 
 method all(%filter?) {
   return self.search(%filter).all if %filter;
@@ -157,8 +160,8 @@ method !gen-field-ins(%fields) {
   @cols.join(', ');
 }
 
-method !set-filter(%filter) { %!filter = %filter; }
-method !set-option(%option) { %!option = %option; }
+method set-filter(%filter) { %!filter := %filter; }
+method set-option(%option) { %!option := %option; }
 method !gen-id($value, :$table?) {
   my @s = $value.split('.');
   @s.prepend($table)
