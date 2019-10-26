@@ -5,14 +5,13 @@
   "description" : "An ORM, with support (and no meta model syntax). postgres",
   "auth"        : "github:tony-o",
   "authors"     : [ "Tony O'Dell" ],
-  "depends"     : [ "DB::Xoos:ver<0.1.0+>", "DB::Pg" ],
+  "depends"     : [ "DB::Xoos:ver<0.1.1+>", "DB::Pg" ],
   "test-depends": [ ],
   "license"     : "Artistic-2.0",
   "provides"    : {
     "DB::Xoos::Pg": "lib/DB/Xoos/Pg.pm6",
-    "DB::Xoos::Pg::Searchable": "lib/DB/Xoos/Pg/Searchable.pm6",
-    "DB::Xoos::Pg::Util::Dynamic": "lib/DB/Xoos/Pg/Util/Dynamic.pm6",
-    "DB::Xoos::Pg::Row": "lib/DB/Xoos/Pg/Row.pm6"
+    "DB::Xoos::Pg::Result": "lib/DB/Xoos/Pg/Result.pm6",
+    "DB::Xoos::Pg::Util::Dynamic": "lib/DB/Xoos/Pg/Util/Dynamic.pm6"
   },
   "tags": [ "ORM", "DB", "database", "model", "relational", "object", "relationship", "mapping", "postgres"],
   "source-url"  : "git://github.com/tony-o/p6-db-xoos-pg.git"
