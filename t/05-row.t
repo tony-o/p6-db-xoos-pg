@@ -1,20 +1,21 @@
 use lib 't/lib';
 use DXPHelper;
 use Test;
-use DB::Xoos::Role::Row;
+use DB::Xoos::Row;
 
+state $db;
 try {
   CATCH { default {
     plan 1;
     ok True, 'Skipping tests, unable to connect to postgres';
     exit 0;
   } }
-  die 'no connection' unless get-db.db.query('select 1;').array;
+  $db = get-db(options => { :dynamic, model-dirs => [ 't/' ]});
+  die 'no connection' unless $db.db.query('select 1;').array;
 }
 
 plan 1;
 
-state $db = get-db(options => { :dynamic, model-dirs => [ 't/' ]});
 subtest {
   my Int $uid = 10000.rand.Int;
   my Int $gid = 10000.rand.Int;
@@ -25,7 +26,7 @@ subtest {
   $model.insert({ name => 'hello world' });
   $obj = $model.search({ :name<hello world> }).first;
 
-  ok $obj ~~ DB::Xoos::Role::Row, 'obj ~~ DB::Xoos::Role::Row';
+  ok $obj ~~ DB::Xoos::Row, 'obj ~~ DB::Xoos::Role::Row';
   is $obj.name, 'hello world', 'name is right';
   $obj.name('whateverable');
   is $obj.name, 'whateverable', 'returns dirty column';

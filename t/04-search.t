@@ -1,20 +1,21 @@
 use lib 't/lib';
 use DXPHelper;
 use Test;
-use DB::Xoos::Pg::Row;
+use DB::Xoos::Row;
 
+state $db;
 try {
   CATCH { default {
     plan 1;
     ok True, 'Skipping tests, unable to connect to postgres';
     exit 0;
   } }
-  die 'no connection' unless get-db.db.query('select 1;').array;
+  $db = get-db(options => { :dynamic, model-dirs => [ 't/' ]});
+  die 'no connection' unless $db.db.query('select 1;').array;
 }
 
 plan 1;
 
-state $db = get-db(options => { :dynamic, model-dirs => [ 't/' ]});
 subtest {
   my Int $uid = 10000.rand.Int;
   my Int $gid = 10000.rand.Int;
@@ -30,10 +31,9 @@ subtest {
     name => "test$uid",
   });
   $obj = $model.search({ :name("test$uid") }).first;
-  is $stay.get-filter, { name => 'XYZ123' };
   @obj = $model.all;
   ok @obj.elems > 0, 'insert went ok';
-  ok @obj[0] ~~ DB::Xoos::Pg::Row, 'object does DB::Xoos::Pg::Row';
+  ok @obj[0] ~~ DB::Xoos::Row, 'object does DB::Xoos::Pg::Row';
   ok @obj.grep({ .name eq "test$uid" }).elems == 1, 'found our test obj';
   is $obj.name, @obj.grep({ .name eq "test$uid" })[0].name, 'got the right name for direct search';
 

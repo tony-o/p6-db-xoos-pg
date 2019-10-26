@@ -1,6 +1,6 @@
-use DB::Xoos::Role::Model;
+use DB::Xoos::Model;
 
-unit class Model::Customers does DB::Xoos::Role::Model['customers'];
+unit class Model::Customers does DB::Xoos::Model['customers'];
 
 has @.columns;
 has @.relations;

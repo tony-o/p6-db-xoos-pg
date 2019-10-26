@@ -1,34 +1,17 @@
-use DB::Xoos:ver<0.1.0+>;
-use DB::Xoos::Util::DSN;
-use DB::Xoos::Pg::Util::Dynamic;
-use DB::Xoos::Pg::Searchable;
-unit class DB::Xoos::Pg does DB::Xoos;
+use DB::Pg;
+unit class DB::Xoos::Pg;
 
-multi method connect(Any:D :$!db, :%options?) {
-  my %dynamic;
-  %dynamic = generate-structure(:db-conn($!db))
-    if %options<dynamic>;
-  self.load-models(%options<model-dirs>//[], :%dynamic);
-  for self!get-cache-keys -> $key {
-    my $model := self!get-cache($key);
-    next if $model ~~ DB::Xoos::Pg::Searchable;
-    $model does DB::Xoos::Pg::Searchable;
-  }
-}
-
-multi method connect(Str:D $dsn, :%options?) {
-  my %connect-params = parse-dsn($dsn);
-
-  die 'Unable to parse DSN '~$dsn
-    unless %connect-params.elems;
+method get-db(%params, :%options) {
+  die 'No connection parameters provided to DB::Xoos::Pg'
+    unless %params.elems;
 
   my $db;
-  my %db-opts = |(:%connect-params<db>//{ });
-  %db-opts<database> = %connect-params<db>   if %connect-params<db>;
-  %db-opts<host>     = %connect-params<host> if %connect-params<host>;
-  %db-opts<port>     = %connect-params<port> if %connect-params<port>;
-  %db-opts<user>     = %connect-params<user> if %connect-params<user>;
-  %db-opts<password> = %connect-params<pass> if %connect-params<pass>;
+  my %db-opts = |(:%params<db>//{ });
+  %db-opts<database> = %params<db>   if %params<db>;
+  %db-opts<host>     = %params<host> if %params<host>;
+  %db-opts<port>     = %params<port> if %params<port>;
+  %db-opts<user>     = %params<user> if %params<user>;
+  %db-opts<password> = %params<pass> if %params<pass>;
 
   my $conninfo = join " ",
     ('dbname=' ~ %db-opts<database>),
@@ -38,8 +21,5 @@ multi method connect(Str:D $dsn, :%options?) {
 
   $db = DB::Pg.new(:$conninfo);
 
-  self.connect(
-    :$db
-    :%options,
-  );
+  $db;
 }

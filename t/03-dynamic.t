@@ -2,18 +2,22 @@ use lib 't/lib';
 use DXPHelper;
 use Test;
 
+state $db;
+my $cwd = $*CWD;
 try {
   CATCH { default {
     plan 1;
     ok True, 'Skipping tests, unable to connect to postgres';
     exit 0;
   } }
-  die 'no connection' unless get-db.db.query('select 1;').array;
+  $*CWD = 't'.IO;
+  $db = get-db(options => { :dynamic, model-dirs => [ 't/' ]});
+  $*CWD = $cwd;
+  die 'no connection' unless $db.db.query('select 1;').array;
 }
 
 plan 1;
 
-state $db = get-db(options => { :dynamic, model-dirs => [ 't/' ]});
 subtest {
   is $db.loaded-models.sort, qw<Customers Orders>, 'added customers and orders tables';
   is $db.model('Customers').columns.map({ .key }).sort, qw<id name>, 'customer has proper columns';
