@@ -1,4 +1,4 @@
-use DB::Xoos::Util::DSN;
+use DB::Xoos::DSN;
 use DB::Pg;
 unit module DB::Xoos::Pg::Util::Dynamic;
 
